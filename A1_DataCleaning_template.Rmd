@@ -192,7 +192,7 @@ A possible way to do so:
 ```{r}
 visit1 <- select(merged[merged$VISIT == 1,], SUBJ, ADOS, MULLENRAW, EXPRESSIVELANGRAW, SOCIALIZATION)
 colnames(visit1) <- c("SUBJ", sapply(2:5, function(x) paste(colnames(visit1)[x], "1", sep="")))
-
+merged <- merge(merged, visit1, all=T)
 
 ```
 
