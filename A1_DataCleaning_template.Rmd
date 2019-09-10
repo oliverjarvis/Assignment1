@@ -112,6 +112,7 @@ Tip: The stringr package is what you need. str_extract () will allow you to extr
 
 ```{r}
 token$VISIT <- str_extract(token$VISIT, regex("\\d"))
+LU$VISIT <- str_extract(token$VISIT, regex("\\d"))
 ```
 
 2c. We also need to make a small adjustment to the content of the Child.ID coloumn in the demographic data. Within this column, names that are not abbreviations do not end with "." (i.e. Adam), which is the case in the other two data sets (i.e. Adam.). If The content of the two variables isn't identical the rows will not be merged.
@@ -173,8 +174,8 @@ Some things to pay attention to:
 * make sure to understand whether (and if so why) there are NAs in the dataset (e.g. some measures were not taken at all visits, some recordings were lost or permission to use was withdrawn)
 
 ```{r}
-merged <- left_join(demo, LU, by = c("SUBJ"))
-
+merged <- merge(demo, LU, all=T)
+merged <- merge(merged, token, all=T)
 ```
 
 
@@ -189,6 +190,9 @@ A possible way to do so:
 
 
 ```{r}
+visit1 <- select(merged[merged$VISIT == 1,], SUBJ, ADOS, MULLENRAW, EXPRESSIVELANGRAW, SOCIALIZATION)
+colnames(visit1) <- c("SUBJ", sapply(2:5, function(x) paste(colnames(visit1)[x], "1", sep="")))
+
 
 ```
 
