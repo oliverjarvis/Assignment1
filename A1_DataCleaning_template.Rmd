@@ -75,6 +75,14 @@ Load the three data sets, after downloading them from dropbox and saving them in
 demo <- read_csv("demo_train.csv")
 LU <- read_csv("LU_train.csv")
 token <- read_csv("token_train.csv")
+
+colnames(demo)[1] <- "SUBJ"
+colnames(demo)[2] <- "VISIT"
+
+colnames(demo) <- sapply(1:36, function(x) toupper(colnames(demo)[x]))
+colnames(LU) <- sapply(1:12, function(x) toupper(colnames(LU)[x]))
+colnames(token) <- sapply(1:8, function(x) toupper(colnames(token)[x]))
+
 ```
 
 Explore the 3 datasets (e.g. visualize them, summarize them, etc.). You will see that the data is messy, since the psychologist collected the demographic data, the linguist analyzed the length of utterance in May 2014 and the fumbling jack-of-all-trades analyzed the words several months later. 
@@ -94,11 +102,7 @@ Tip: look through the chapter on data transformation in R for data science (http
 
 
 ```{r}
-pacman::p_load(cowplot)
-p1 <- ggplot(data = data.frame(x = c(-3, 3)), aes(x)) +
-  stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 1)) + ylab("") +
-  scale_y_continuous(breaks = NULL)
-p1
+
 ```
 
 2b. Find a way to homogeneize the way "visit" is reported (visit1 vs. 1).
@@ -107,8 +111,7 @@ Tip: The stringr package is what you need. str_extract () will allow you to extr
 
 
 ```{r}
-
-
+token$VISIT <- str_extract(token$VISIT, regex("\\d"))
 ```
 
 2c. We also need to make a small adjustment to the content of the Child.ID coloumn in the demographic data. Within this column, names that are not abbreviations do not end with "." (i.e. Adam), which is the case in the other two data sets (i.e. Adam.). If The content of the two variables isn't identical the rows will not be merged.
@@ -119,6 +122,9 @@ Tip: You can either have one line of code for each child name that is to be chan
 
 
 ```{r}
+token$SUBJ <- str_replace_all(token$SUBJ, "\\.", "")
+LU$SUBJ <- str_replace_all(LU$SUBJ, "\\.", "")
+demo$SUBJ <- str_replace_all(demo$SUBJ, "\\.", "")
 
 ```
 
@@ -155,7 +161,9 @@ Most variables should make sense, here the less intuitive ones.
 Feel free to rename the variables into something you can remember (i.e. nonVerbalIQ, verbalIQ)
 
 ```{r}
-
+demo <- demo %>% select(c(1:4, 7, 9, 14, 24, 33, 22))
+LU <- LU %>% select(c(1:3, 8))
+token <- token %>% select(c(1:3,4, 6,7))
 ```
 
 2e. Finally we are ready to merge all the data sets into just one. 
@@ -165,7 +173,7 @@ Some things to pay attention to:
 * make sure to understand whether (and if so why) there are NAs in the dataset (e.g. some measures were not taken at all visits, some recordings were lost or permission to use was withdrawn)
 
 ```{r}
-
+merged <- left_join(demo, LU, by = c("SUBJ"))
 
 ```
 
