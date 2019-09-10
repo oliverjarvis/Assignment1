@@ -204,7 +204,11 @@ Now we want to
 * Save the data set using into a csv file. Hint: look into write.csv()
 
 ```{r}
+merged$SUBJ <- as.numeric(as.factor(merged$SUBJ))
+merged$GENDER <- ifelse(merged$GENDER  == 1, "male", "female")
+merged$DIAGNOSIS <- ifelse(merged$DIAGNOSIS == "A", "ASD", "TD")
 
+write_csv(merged, "LangDevASD.csv")
 ```
 
 
